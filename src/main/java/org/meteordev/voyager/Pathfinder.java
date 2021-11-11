@@ -1,11 +1,11 @@
-package meteordevelopment.voyager;
+package org.meteordev.voyager;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectHeapPriorityQueue;
-import meteordevelopment.voyager.utils.Chat;
-import meteordevelopment.voyager.utils.Color;
-import meteordevelopment.voyager.utils.Renderer;
+import org.meteordev.voyager.utils.Chat;
+import org.meteordev.voyager.utils.Color;
+import org.meteordev.voyager.utils.Renderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.util.math.MatrixStack;

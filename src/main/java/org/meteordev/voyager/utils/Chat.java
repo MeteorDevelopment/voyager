@@ -1,9 +1,9 @@
-package meteordevelopment.voyager.utils;
+package org.meteordev.voyager.utils;
 
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 public class Chat {
     public static void send(String format, Object... args) {

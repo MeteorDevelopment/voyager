@@ -1,7 +1,7 @@
-package meteordevelopment.voyager.mixin;
+package org.meteordev.voyager.mixin;
 
-import meteordevelopment.voyager.VInput;
-import meteordevelopment.voyager.Pathfinder;
+import org.meteordev.voyager.VInput;
+import org.meteordev.voyager.Pathfinder;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 @Mixin(value = GameRenderer.class, priority = 100)
 public abstract class GameRendererMixin {

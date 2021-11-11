@@ -1,4 +1,4 @@
-package meteordevelopment.voyager;
+package org.meteordev.voyager;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.Set;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 public class Grid implements Iterable<VChunk> {
     public int nodeCount;

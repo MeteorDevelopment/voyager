@@ -1,6 +1,6 @@
-package meteordevelopment.voyager.mixin;
+package org.meteordev.voyager.mixin;
 
-import meteordevelopment.voyager.VInput;
+import org.meteordev.voyager.VInput;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

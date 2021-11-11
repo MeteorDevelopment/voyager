@@ -1,4 +1,4 @@
-package meteordevelopment.voyager.utils;
+package org.meteordev.voyager.utils;
 
 public class Color {
     public int r, g, b, a;

@@ -1,6 +1,6 @@
-package meteordevelopment.voyager.mixin;
+package org.meteordev.voyager.mixin;
 
-import meteordevelopment.voyager.Pathfinder;
+import org.meteordev.voyager.Pathfinder;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;

@@ -1,8 +1,8 @@
-package meteordevelopment.voyager.utils;
+package org.meteordev.voyager.utils;
 
 import net.minecraft.util.math.MathHelper;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 public class Utils {
     public static double getYaw(double x, double z) {

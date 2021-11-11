@@ -1,4 +1,4 @@
-package meteordevelopment.voyager;
+package org.meteordev.voyager;
 
 public record Connection(Type type, Node node) {
     public enum Type {

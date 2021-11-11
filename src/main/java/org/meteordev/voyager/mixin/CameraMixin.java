@@ -1,6 +1,6 @@
-package meteordevelopment.voyager.mixin;
+package org.meteordev.voyager.mixin;
 
-import meteordevelopment.voyager.VInput;
+import org.meteordev.voyager.VInput;
 import net.minecraft.client.render.Camera;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.BlockView;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 @Mixin(value = Camera.class, priority = 100)
 public class CameraMixin {

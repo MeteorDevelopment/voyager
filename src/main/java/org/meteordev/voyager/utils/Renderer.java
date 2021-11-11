@@ -1,14 +1,13 @@
-package meteordevelopment.voyager.utils;
+package org.meteordev.voyager.utils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 public class Renderer {
     private final BufferBuilder triangles = new BufferBuilder(256 * 256);
