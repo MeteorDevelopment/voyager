@@ -24,8 +24,7 @@ jobs:
       - name: Remove dev and sources jars
         run: |
           rm ./build/libs/*-dev.jar
-          rm ./build/libs/*-sources.jar
-        
+
       - name: Publish Development Build
         uses: marvinpinto/action-automatic-releases@latest
         with:
