@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "voyager",
+  "version": "${version}",
+  "name": "Voyager",
+  "description": "Path finding bot for Minecraft.",
+  "authors": [
+    "MineGame159"
+  ],
+  "contact": {
+    "repo": "https://github.com/MeteorDevelopment/pathfinder"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/pathfinder/icon.png",
+  "environment": "client",
+  "mixins": [
+    "voyager.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.12.5",
+    "minecraft": "1.17.1"
+  }
+}
