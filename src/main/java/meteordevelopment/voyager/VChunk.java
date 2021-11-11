@@ -8,7 +8,6 @@ import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -175,25 +174,6 @@ public class VChunk implements Iterable<Node> {
 
     public Node get(int x, int y, int z) {
         return nodes[x][y][z];
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        VChunk nodes1 = (VChunk) o;
-
-        if (grid != null ? !grid.equals(nodes1.grid) : nodes1.grid != null) return false;
-        if (chunk != null ? !chunk.equals(nodes1.chunk) : nodes1.chunk != null) return false;
-        if (!Arrays.deepEquals(nodes, nodes1.nodes)) return false;
-        if (nodeList != null ? !nodeList.equals(nodes1.nodeList) : nodes1.nodeList != null) return false;
-        return pos != null ? pos.equals(nodes1.pos) : nodes1.pos == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return chunk.hashCode();
     }
 
     @NotNull

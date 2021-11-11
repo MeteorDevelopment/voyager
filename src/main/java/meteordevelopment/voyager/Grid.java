@@ -2,7 +2,7 @@ package meteordevelopment.voyager;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArraySet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +17,8 @@ public class Grid implements Iterable<VChunk> {
 
     private final Long2ObjectMap<VChunk> chunks = new Long2ObjectOpenHashMap<>();
 
-    private final Set<VChunk> dirtyChunks = new ObjectArraySet<>(); // Not using ObjectOpenHashSet because there is a bug that can occur when iterating over elements
-    private final Set<VChunk> dirtyChunksConnections = new ObjectArraySet<>();
+    private final Set<VChunk> dirtyChunks = new ObjectOpenHashSet<>();
+    private final Set<VChunk> dirtyChunksConnections = new ObjectOpenHashSet<>();
 
     public Grid(ChunkPos pos) {
         for (int x = pos.x - 7; x <= pos.x + 7; x++) {
