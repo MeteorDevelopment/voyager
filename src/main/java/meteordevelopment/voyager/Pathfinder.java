@@ -25,7 +25,7 @@ public class Pathfinder {
 
     private static final Renderer renderer = new Renderer();
 
-    private static Grid grid;
+    public static Grid grid;
     private static Node start, end;
     private static List<Node> path;
     private static Input prevInput;
@@ -35,8 +35,12 @@ public class Pathfinder {
 
         grid = new Grid(mc.player.getChunkPos());
 
-        if (start != null) setNode(true, start.x(), start.y(), start.z());
-        if (end != null) setNode(false, end.x(), end.y(), end.z());
+        refreshStartAndEndNodes();
+    }
+
+    private static void refreshStartAndEndNodes() {
+        if (start != null) setNode(true, start.x(), start.y(), start.z(), false);
+        if (end != null) setNode(false, end.x(), end.y(), end.z(), false);
     }
 
     private static class PriorityQueueImpl<T> extends ObjectHeapPriorityQueue<T> {
@@ -54,7 +58,12 @@ public class Pathfinder {
     }
 
     private static void calculatePath() {
-        if (grid == null) return;
+        if (grid == null || end == null) return;
+
+        long startTime = System.nanoTime();
+
+        if (grid.updateChunks()) refreshStartAndEndNodes();
+        if (end == null) return;
 
         Node start = Pathfinder.start;
         boolean move = false;
@@ -63,15 +72,13 @@ public class Pathfinder {
             BlockPos pos = mc.player.getBlockPos();
 
             start = grid.getNode(pos.getX(), pos.getY(), pos.getZ());
+            if (start == null) return;
+
             move = true;
         }
 
-        if (start == null || end == null) return;
-
-        stopMovement();
-
         Chat.send("Calculating path");
-        long startTime = System.nanoTime();
+        stopMovement();
 
         Object2FloatMap<Node> gScore = new Object2FloatOpenHashMap<>();
         gScore.defaultReturnValue(Float.POSITIVE_INFINITY);
@@ -139,14 +146,20 @@ public class Pathfinder {
         return end.distanceTo(node);
     }
 
-    private static void setNode(boolean start, int x, int y, int z) {
+    private static void setNode(boolean start, int x, int y, int z, boolean toggle) {
         if (grid == null) return;
 
         Node node = grid.getNode(x, y, z);
         if (node == null) return;
 
-        if (start) Pathfinder.start = Pathfinder.start == node ? null : node;
-        else end = end == node ? null : node;
+        if (toggle) {
+            if (start) Pathfinder.start = Pathfinder.start == node ? null : node;
+            else end = end == node ? null : node;
+        }
+        else {
+            if (start) Pathfinder.start = node;
+            else end = node;
+        }
     }
 
     public static void stopMovement() {
@@ -219,12 +232,12 @@ public class Pathfinder {
             }
             case GLFW.GLFW_KEY_KP_4 -> {
                 BlockPos pos = mc.player.getBlockPos();
-                setNode(true, pos.getX(), pos.getY(), pos.getZ());
+                setNode(true, pos.getX(), pos.getY(), pos.getZ(), true);
                 yield true;
             }
             case GLFW.GLFW_KEY_KP_5 -> {
                 BlockPos pos = mc.player.getBlockPos();
-                setNode(false, pos.getX(), pos.getY(), pos.getZ());
+                setNode(false, pos.getX(), pos.getY(), pos.getZ(), true);
                 yield true;
             }
             case GLFW.GLFW_KEY_KP_6 -> {

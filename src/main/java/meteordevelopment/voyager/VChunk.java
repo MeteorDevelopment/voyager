@@ -8,6 +8,7 @@ import net.minecraft.world.chunk.Chunk;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -25,6 +26,24 @@ public class VChunk implements Iterable<Node> {
     public VChunk(Grid grid, Chunk chunk) {
         this.grid = grid;
         this.chunk = chunk;
+
+        generateNodes();
+    }
+
+    public void generateNodes() {
+        if (!nodeList.isEmpty()) {
+            grid.nodeCount -= nodeList.size();
+            nodeList.clear();
+
+            // TODO: This is horrible
+            for (int x = 0; x < 16; x++) {
+                for (int y = 0; y < 256; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        nodes[x][y][z] = null;
+                    }
+                }
+            }
+        }
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -44,47 +63,46 @@ public class VChunk implements Iterable<Node> {
     }
 
     public void generateConnections() {
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 256; y++) {
-                for (int z = 0; z < 16; z++) {
-                    Node node = nodes[x][y][z];
-                    if (node == null) continue;
+        for (Node node : nodeList) {
+            int x = node.x() & 15;
+            int y = node.y();
+            int z = node.z() & 15;
 
-                    // Neighbours
-                    for (int i = -1; i <= 1; i++) {
-                        Node n = getChecked(x + 1, y + i, z);
-                        if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
+            node.connections().clear();
 
-                        n = getChecked(x - 1, y + i, z);
-                        if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
+            // Neighbours
+            for (int i = -1; i <= 1; i++) {
+                Node n = getChecked(x + 1, y + i, z);
+                if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
 
-                        n = getChecked(x, y + i, z + 1);
-                        if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
+                n = getChecked(x - 1, y + i, z);
+                if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
 
-                        n = getChecked(x, y + i, z - 1);
-                        if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
-                    }
+                n = getChecked(x, y + i, z + 1);
+                if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
 
-                    // Diagonals
-                    checkDiagonal(x, y, z, 1, 1, node);
-                    checkDiagonal(x, y, z, -1, -1, node);
-                    checkDiagonal(x, y, z, -1, 1, node);
-                    checkDiagonal(x, y, z, 1, -1, node);
-
-                    // Jump one forward
-                    Node n = getChecked(x + 2, y, z);
-                    if (n != null && canWalkThrough(x + 1, y - 1, z, false) && canWalkThrough(x + 1, y, z)) node.connections().add(new Connection(Connection.Type.Jump1, n));
-
-                    n = getChecked(x - 2, y, z);
-                    if (n != null && canWalkThrough(x - 1, y - 1, z, false) && canWalkThrough(x - 1, y, z)) node.connections().add(new Connection(Connection.Type.Jump1, n));
-
-                    n = getChecked(x, y, z + 2);
-                    if (n != null && canWalkThrough(x, y - 1, z + 1, false) && canWalkThrough(x, y, z + 1)) node.connections().add(new Connection(Connection.Type.Jump1, n));
-
-                    n = getChecked(x, y, z - 2);
-                    if (n != null && canWalkThrough(x, y - 1, z - 1, false) && canWalkThrough(x, y, z - 1)) node.connections().add(new Connection(Connection.Type.Jump1, n));
-                }
+                n = getChecked(x, y + i, z - 1);
+                if (n != null) node.connections().add(new Connection(i > 0 ? Connection.Type.Jump : Connection.Type.Straight, n));
             }
+
+            // Diagonals
+            checkDiagonal(x, y, z, 1, 1, node);
+            checkDiagonal(x, y, z, -1, -1, node);
+            checkDiagonal(x, y, z, -1, 1, node);
+            checkDiagonal(x, y, z, 1, -1, node);
+
+            // Jump one forward
+            Node n = getChecked(x + 2, y, z);
+            if (n != null && canWalkThrough(x + 1, y - 1, z, false) && canWalkThrough(x + 1, y, z)) node.connections().add(new Connection(Connection.Type.Jump1, n));
+
+            n = getChecked(x - 2, y, z);
+            if (n != null && canWalkThrough(x - 1, y - 1, z, false) && canWalkThrough(x - 1, y, z)) node.connections().add(new Connection(Connection.Type.Jump1, n));
+
+            n = getChecked(x, y, z + 2);
+            if (n != null && canWalkThrough(x, y - 1, z + 1, false) && canWalkThrough(x, y, z + 1)) node.connections().add(new Connection(Connection.Type.Jump1, n));
+
+            n = getChecked(x, y, z - 2);
+            if (n != null && canWalkThrough(x, y - 1, z - 1, false) && canWalkThrough(x, y, z - 1)) node.connections().add(new Connection(Connection.Type.Jump1, n));
         }
     }
 
@@ -157,6 +175,25 @@ public class VChunk implements Iterable<Node> {
 
     public Node get(int x, int y, int z) {
         return nodes[x][y][z];
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        VChunk nodes1 = (VChunk) o;
+
+        if (grid != null ? !grid.equals(nodes1.grid) : nodes1.grid != null) return false;
+        if (chunk != null ? !chunk.equals(nodes1.chunk) : nodes1.chunk != null) return false;
+        if (!Arrays.deepEquals(nodes, nodes1.nodes)) return false;
+        if (nodeList != null ? !nodeList.equals(nodes1.nodeList) : nodes1.nodeList != null) return false;
+        return pos != null ? pos.equals(nodes1.pos) : nodes1.pos == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return chunk.hashCode();
     }
 
     @NotNull
