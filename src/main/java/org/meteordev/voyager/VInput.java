@@ -7,6 +7,8 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
+import static org.meteordev.voyager.Pathfinder.mc;
+
 public class VInput extends Input {
     private final List<Node> path;
     private Node current, next;
@@ -19,10 +21,10 @@ public class VInput extends Input {
     public VInput(List<Node> path) {
         this.path = path;
 
-        prevYaw = yaw = Pathfinder.mc.player.getYaw();
+        prevYaw = yaw = mc.player.getYaw();
 
         next();
-        Pathfinder.mc.player.setYaw(getNextYaw());
+        mc.player.setYaw(getNextYaw());
     }
 
     private void tickBase() {
@@ -41,7 +43,7 @@ public class VInput extends Input {
         jumping = false;
 
         if (waitForGround) {
-            if (Pathfinder.mc.player.isOnGround()) waitForGround = false;
+            if (mc.player.isOnGround()) waitForGround = false;
             else {
                 tickBase();
                 return;
@@ -53,7 +55,7 @@ public class VInput extends Input {
         if (isNew) {
             // Jump or Jump1
             if (is(1, 1) || is(2, 0)) {
-                if (!Pathfinder.mc.player.isOnGround()) {
+                if (!mc.player.isOnGround()) {
                     waitForGround = true;
                     return;
                 }
@@ -63,8 +65,8 @@ public class VInput extends Input {
             }
         }
 
-        Pathfinder.mc.player.setYaw(getNextYaw());
-        Pathfinder.mc.player.setSprinting(sprinting);
+        mc.player.setYaw(getNextYaw());
+        mc.player.setSprinting(sprinting);
 
         isNew = false;
         tickBase();
@@ -85,8 +87,8 @@ public class VInput extends Input {
     }
 
     private double getDistanceToNext(Vec3d vec) {
-        double dx = (next.x() + 0.5) - (Pathfinder.mc.player.getX() + vec.x);
-        double dz = (next.z() + 0.5) - (Pathfinder.mc.player.getZ() + vec.z);
+        double dx = (next.x() + 0.5) - (mc.player.getX() + vec.x);
+        double dz = (next.z() + 0.5) - (mc.player.getZ() + vec.z);
 
         return Math.sqrt(dx * dx + dz * dz);
     }
@@ -107,8 +109,8 @@ public class VInput extends Input {
     public void limitMovement(Vec3d vec) {
         modified = modifiedX = modifiedZ = false;
 
-        double x = Pathfinder.mc.player.getX() + vec.x;
-        double z = Pathfinder.mc.player.getZ() + vec.z;
+        double x = mc.player.getX() + vec.x;
+        double z = mc.player.getZ() + vec.z;
 
         double nextX = next.x() + 0.5;
         double nextZ = next.z() + 0.5;
@@ -120,24 +122,24 @@ public class VInput extends Input {
 
         if (vec2.x > 0) {
             if (x > nextX) {
-                vec2.x = nextX - Pathfinder.mc.player.getX();
+                vec2.x = nextX - mc.player.getX();
                 modifiedX = true;
             }
         } else if (vec2.x < 0) {
             if (x < nextX) {
-                vec2.x = -(Pathfinder.mc.player.getX() - nextX);
+                vec2.x = -(mc.player.getX() - nextX);
                 modifiedX = true;
             }
         }
 
         if (vec2.z > 0) {
             if (z > nextZ) {
-                vec2.z = nextZ - Pathfinder.mc.player.getZ();
+                vec2.z = nextZ - mc.player.getZ();
                 modifiedZ = true;
             }
         } else if (vec2.z < 0) {
             if (z < nextZ) {
-                vec2.z = -(Pathfinder.mc.player.getZ() - nextZ);
+                vec2.z = -(mc.player.getZ() - nextZ);
                 modifiedZ = true;
             }
         }
@@ -161,14 +163,14 @@ public class VInput extends Input {
     public void afterMove() {
         if (!modified) return;
 
-        Vec3d velocity = Pathfinder.mc.player.getVelocity();
+        Vec3d velocity = mc.player.getVelocity();
 
         if (modifiedX) velocity.x = 0;
         if (modifiedZ) velocity.z = 0;
 
         if (stop) {
             Pathfinder.stopMovement();
-            Pathfinder.mc.player.setYaw(yaw);
+            mc.player.setYaw(yaw);
         }
     }
 
