@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static meteordevelopment.voyager.Pathfinder.mc;
+
 public class VChunk implements Iterable<Node> {
     private final Grid grid;
     private final Chunk chunk;
@@ -109,7 +111,7 @@ public class VChunk implements Iterable<Node> {
         if (state.isAir()) return true;
         if (includeFluids && !state.getFluidState().isEmpty()) return false;
 
-        return state.getCollisionShape(Pathfinder.mc.world, pos).isEmpty();
+        return state.getCollisionShape(mc.world, pos).isEmpty();
     }
     private boolean canWalkThrough(int x, int y, int z) {
         return canWalkThrough(x, y, z, true);
@@ -167,7 +169,7 @@ public class VChunk implements Iterable<Node> {
 
         if (x >= 0 && x < 16 && z >= 0 && z < 16) return chunk.getBlockState(pos.set(x, y, z));
 
-        return Pathfinder.mc.world.getBlockState(pos.set(chunk.getPos().x * 16 + x, y, chunk.getPos().z * 16 + z));
+        return mc.world.getBlockState(pos.set(chunk.getPos().x * 16 + x, y, chunk.getPos().z * 16 + z));
     }
 
     public Node get(int x, int y, int z) {
