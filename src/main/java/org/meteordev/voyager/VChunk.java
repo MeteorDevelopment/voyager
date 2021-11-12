@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static org.meteordev.voyager.Pathfinder.mc;
 
 public class VChunk implements Iterable<Node> {
     private final Grid grid;
