@@ -2,7 +2,7 @@ package meteordevelopment.voyager.utils;
 
 import net.minecraft.util.math.MathHelper;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static meteordevelopment.voyager.Voyager.mc;
 
 public class Utils {
     public static double getYaw(double x, double z) {

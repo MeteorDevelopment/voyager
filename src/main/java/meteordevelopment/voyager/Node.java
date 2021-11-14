@@ -1,13 +1,16 @@
 package meteordevelopment.voyager;
 
-import java.util.List;
+public class Node {
+    public final int x, y, z;
+    public float gScore = Float.POSITIVE_INFINITY;
+    public float fScore = Float.POSITIVE_INFINITY;
 
-public record Node(int x, int y, int z, List<Connection> connections) {
-    public float distanceTo(Node node) {
-        float dX = node.x - x;
-        float dY = node.y - y;
-        float dZ = node.z - z;
-        return (float) Math.sqrt(dX * dX + dY * dY + dZ * dZ);
+    public Node cameFrom;
+
+    public Node(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
@@ -28,14 +31,5 @@ public record Node(int x, int y, int z, List<Connection> connections) {
         result = 31 * result + y;
         result = 31 * result + z;
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Node{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
     }
 }

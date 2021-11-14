@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static meteordevelopment.voyager.Voyager.mc;
 
 @Mixin(value = Camera.class, priority = 100)
 public class CameraMixin {

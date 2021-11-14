@@ -20,7 +20,7 @@ public class Path {
             Node node = oldPath.get(i);
 
             if (last == null) {
-                if (start.y() != node.y()) {
+                if (start.y != node.y) {
                     path.add(node);
                     start = node;
 
@@ -34,7 +34,7 @@ public class Path {
                 continue;
             }
 
-            if (last.y() != node.y()) {
+            if (last.y != node.y) {
                 path.add(last);
                 start = node;
                 last = null;
@@ -43,7 +43,7 @@ public class Path {
                 continue;
             }
 
-            if (last.x() + dirX == node.x() && last.z() + dirZ == node.z()) {
+            if (last.x + dirX == node.x && last.z + dirZ == node.z) {
                 last = node;
             }
             else {
@@ -62,12 +62,12 @@ public class Path {
     }
 
     public static int getDirX(Node from, Node to) {
-        if (from.x() == to.x()) return 0;
-        return to.x() > from.x() ? 1 : -1;
+        if (from.x == to.x) return 0;
+        return to.x > from.x ? 1 : -1;
     }
 
     public static int getDirZ(Node from, Node to) {
-        if (from.z() == to.z()) return 0;
-        return to.z() > from.z() ? 1 : -1;
+        if (from.z == to.z) return 0;
+        return to.z > from.z ? 1 : -1;
     }
 }

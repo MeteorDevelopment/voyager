@@ -7,7 +7,7 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static meteordevelopment.voyager.Voyager.mc;
 
 public class VInput extends Input {
     private final List<Node> path;
@@ -73,22 +73,22 @@ public class VInput extends Input {
     }
 
     private boolean is(int h, int y) {
-        if (current == null || next.y() != current.y() + y) return false;
+        if (current == null || next.y != current.y + y) return false;
 
-        double dx = next.x() - current.x();
-        double dz = next.z() - current.z();
+        double dx = next.x - current.x;
+        double dz = next.z - current.z;
         double dist = Math.sqrt(dx * dx + dz * dz);
 
         return dist == h;
     }
 
     private float getNextYaw() {
-        return (float) Utils.getYaw(next.x() + 0.5, next.z() + 0.5);
+        return (float) Utils.getYaw(next.x + 0.5, next.z + 0.5);
     }
 
     private double getDistanceToNext(Vec3d vec) {
-        double dx = (next.x() + 0.5) - (mc.player.getX() + vec.x);
-        double dz = (next.z() + 0.5) - (mc.player.getZ() + vec.z);
+        double dx = (next.x + 0.5) - (mc.player.getX() + vec.x);
+        double dz = (next.z + 0.5) - (mc.player.getZ() + vec.z);
 
         return Math.sqrt(dx * dx + dz * dz);
     }
@@ -112,8 +112,8 @@ public class VInput extends Input {
         double x = mc.player.getX() + vec.x;
         double z = mc.player.getZ() + vec.z;
 
-        double nextX = next.x() + 0.5;
-        double nextZ = next.z() + 0.5;
+        double nextX = next.x + 0.5;
+        double nextZ = next.z + 0.5;
 
         double dx = Math.abs(x - nextX);
         double dz = Math.abs(z - nextZ);
@@ -150,7 +150,7 @@ public class VInput extends Input {
 
             if (!next()) stop = true;
             else if (prev != null) {
-                if (current.y() == next.y() && current.x() + Path.getDirX(prev, current) == next.x() && current.z() + Path.getDirZ(prev, current) == next.z()) return;
+                if (current.y == next.y && current.x + Path.getDirX(prev, current) == next.x&& current.z+ Path.getDirZ(prev, current) == next.z) return;
             }
         }
 
@@ -169,7 +169,7 @@ public class VInput extends Input {
         if (modifiedZ) velocity.z = 0;
 
         if (stop) {
-            Pathfinder.stopMovement();
+            Voyager.stopMovement();
             mc.player.setYaw(yaw);
         }
     }

@@ -3,7 +3,7 @@ package meteordevelopment.voyager.utils;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
-import static meteordevelopment.voyager.Pathfinder.mc;
+import static meteordevelopment.voyager.Voyager.mc;
 
 public class Chat {
     public static void send(String format, Object... args) {

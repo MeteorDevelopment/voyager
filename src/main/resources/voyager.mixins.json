@@ -9,7 +9,7 @@
     "CameraMixin",
     "EntityMixin",
     "GameRendererMixin",
-    "WorldChunkMixin"
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
