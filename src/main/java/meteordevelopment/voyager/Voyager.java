@@ -67,7 +67,9 @@ public class Voyager {
         MoveGenerator moves = new MoveGenerator(ctx);
         Node endedAt = null;
         int visited = 0;
+        int outsideHits = 0;
 
+        loop:
         while (openSet.size() > 0) {
             Node current = openSet.dequeue();
             visited++;
@@ -79,7 +81,14 @@ public class Voyager {
 
             moves.set(current.x, current.y, current.z);
             while (moves.hasNext()) {
-                if (!moves.next()) continue;
+                if (!moves.next()) {
+                    if (moves.moveOutside && ++outsideHits >= 50) {
+                        endedAt = current;
+                        break loop;
+                    }
+                    continue;
+                }
+
                 long key = BlockPos.asLong(moves.moveX, moves.moveY, moves.moveZ);
 
                 Node node = nodes.get(key);
@@ -103,7 +112,7 @@ public class Voyager {
 
         double elapsed = (System.nanoTime() - startTime) / 1000000000.0;
         Chat.send("Finished calculating path in %.3f s" + (endedAt == null ? ", no path" : ""), elapsed);
-        Chat.send("  Nodes: %d, Visited: %d", nodes.size(), visited);
+        Chat.send("  Nodes: %d, Visited: %d, Outside hits: %d", nodes.size(), visited, outsideHits);
 
         if (endedAt == null) return;
 

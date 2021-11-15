@@ -57,4 +57,12 @@ public class Context {
 
         return !state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
     }
+
+    public boolean isOutside(int x, int z) {
+        int cx = x >> 4;
+        int cz = z >> 4;
+
+        if (lastChunk != null && lastChunk.getPos().x == cx && lastChunk.getPos().z == cz) return false;
+        return world.getChunk(cx, cz, ChunkStatus.FULL, false) == null;
+    }
 }

@@ -6,6 +6,7 @@ public class MoveGenerator {
     private int moveI;
 
     public int moveX, moveY, moveZ;
+    public boolean moveOutside;
     public float moveCost;
 
     public MoveGenerator(Context ctx) {
@@ -60,11 +61,15 @@ public class MoveGenerator {
     }
 
     private boolean checkStraight(int dx, int dz) {
+        if (ctx.isOutside(x + dx, z + dz)) return outside();
+
         if (ctx.canWalkOn(x + dx, y - 1, z + dz) && canWalkThrough(x + dx, y, z + dz)) return move(x + dx, y, z + dz, 1);
         return false;
     }
 
     private boolean checkDiagonal(int dx, int dz) {
+        if (ctx.isOutside(x + dx, z + dz)) return outside();
+
         if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
 
         boolean canX = canWalkThrough(x + dx, y, z);
@@ -79,6 +84,8 @@ public class MoveGenerator {
     }
 
     private boolean checkStep(boolean up, int dx, int dz, float cost) {
+        if (ctx.isOutside(x + dx, z + dz)) return outside();
+
         if (up) {
             if (ctx.canWalkOn(x + dx, y - 2, z) && canWalkThrough(x + dx, y - 1, z + dz)) return move(x + dx, y - 1, z + dz, cost);
         }
@@ -90,6 +97,8 @@ public class MoveGenerator {
     }
 
     private boolean checkJump1(int dx, int dz) {
+        if (ctx.isOutside(x + dx, z + dz)) return outside();
+
         if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
 
         if (!ctx.canWalkOn(x + dx / 2, y - 1, z + dz / 2) && canWalkThrough(x + dx / 2, y, z + dz / 2)) return move(x + dx, y, z + dz, 3.25f);
@@ -105,7 +114,13 @@ public class MoveGenerator {
         moveX = x;
         moveY = y;
         moveZ = z;
+        moveOutside = false;
         moveCost = cost;
         return true;
+    }
+
+    private boolean outside() {
+        moveOutside = true;
+        return false;
     }
 }
