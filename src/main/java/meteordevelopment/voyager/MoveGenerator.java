@@ -1,55 +1,111 @@
 package meteordevelopment.voyager;
 
-import java.util.List;
-
 public class MoveGenerator {
-    /** Generates all possible moves from a position. */
-    public static void generate(Context ctx, int x, int y, int z, List<Move> moves) {
-        if (!ctx.canWalkOn(x, y - 1, z) || !canWalkThrough(ctx, x, y, z)) return;
+    private final Context ctx;
+    private int x, y, z;
+    private int moveI;
 
-        // Forward
-        checkForward(ctx, x + 1, y, z, moves);
-        checkForward(ctx, x - 1, y, z, moves);
-        checkForward(ctx, x, y, z + 1, moves);
-        checkForward(ctx, x, y, z - 1, moves);
+    public int moveX, moveY, moveZ;
+    public float moveCost;
 
-        // Diagonal
-        checkDiagonal(ctx, x, y, z, 1, 1, moves);
-        checkDiagonal(ctx, x, y, z, -1, -1, moves);
-        checkDiagonal(ctx, x, y, z, 1, -1, moves);
-        checkDiagonal(ctx, x, y, z, -1, 1, moves);
-
-        // Jump 1 forward
-        checkJump1(ctx, x, y, z, 2, 0, moves);
-        checkJump1(ctx, x, y, z, -2, 0, moves);
-        checkJump1(ctx, x, y, z, 0, 2, moves);
-        checkJump1(ctx, x, y, z, 0, -2, moves);
+    public MoveGenerator(Context ctx) {
+        this.ctx = ctx;
     }
 
-    private static void checkForward(Context ctx, int x, int y, int z, List<Move> moves) {
-        if (ctx.canWalkOn(x, y - 1, z) && canWalkThrough(ctx, x, y, z)) moves.add(new Move(Move.Type.Forward, x, y, z, 1));
-        else if (ctx.canWalkOn(x, y - 2, z) && canWalkThrough(ctx, x, y - 1, z)) moves.add(new Move(Move.Type.Forward, x, y - 1, z, 1));
-        else if (ctx.canWalkOn(x, y, z) && canWalkThrough(ctx, x, y + 1, z)) moves.add(new Move(Move.Type.Jump, x, y + 1, z, 3.25f));
+    public void set(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.moveI = 0;
     }
 
-    private static void checkDiagonal(Context ctx, int x, int y, int z, int dx, int dz, List<Move> moves) {
-        if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(ctx, x + dx, y, z + dz)) return;
-
-        boolean canX = canWalkThrough(ctx, x + dx, y, z);
-        boolean canZ = canWalkThrough(ctx, x, y, z + dz);
-        if (!canX && !canZ) return;
-
-        if (canX && canZ) moves.add(new Move(Move.Type.Forward, x + dx, y, z + dz, 1));
-        else moves.add(new Move(Move.Type.CornerBump, x + dx, y, z + dz, 2.5f));
+    public boolean hasNext() {
+        return moveI < 20;
     }
 
-    private static void checkJump1(Context ctx, int x, int y, int z, int dx, int dz, List<Move> moves) {
-        if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(ctx, x + dx, y, z + dz)) return;
+    public boolean next() {
+        return switch (moveI++) {
+            // Straight
+            case 0 -> checkStraight(1, 0);
+            case 1 -> checkStraight(-1, 0);
+            case 2 -> checkStraight(0, 1);
+            case 3 -> checkStraight(0, -1);
 
-        if (!ctx.canWalkOn(x + dx / 2, y - 1, z + dz / 2) && canWalkThrough(ctx, x + dx / 2, y, z + dz / 2)) moves.add(new Move(Move.Type.Jump, x + dx, y, z + dz, 3.25f));
+            // Diagonal
+            case 4 -> checkDiagonal(1, 1);
+            case 5 -> checkDiagonal(-1, -1);
+            case 6 -> checkDiagonal(1, -1);
+            case 7 -> checkDiagonal(-1, 1);
+
+            // Step up
+            case 8 -> checkStep(true, 1, 0, 3.25f);
+            case 9 -> checkStep(true, -1, 0, 3.25f);
+            case 10 -> checkStep(true, 0, 1, 3.25f);
+            case 11 -> checkStep(true, 0, -1, 3.25f);
+
+            // Step down
+            case 12 -> checkStep(false, 1, 0, 1);
+            case 13 -> checkStep(false, -1, 0, 1);
+            case 14 -> checkStep(false, 0, 1, 1);
+            case 15 -> checkStep(false, 0, -1, 1);
+
+            // Jump 1
+            case 16 -> checkJump1(2, 0);
+            case 17 -> checkJump1(-2, 0);
+            case 18 -> checkJump1(0, 2);
+            case 19 -> checkJump1(0, -2);
+
+            default -> false;
+        };
     }
 
-    private static boolean canWalkThrough(Context ctx, int x, int y, int z) {
+    private boolean checkStraight(int dx, int dz) {
+        if (ctx.canWalkOn(x + dx, y - 1, z + dz) && canWalkThrough(x + dx, y, z + dz)) return move(x + dx, y, z + dz, 1);
+        return false;
+    }
+
+    private boolean checkDiagonal(int dx, int dz) {
+        if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
+
+        boolean canX = canWalkThrough(x + dx, y, z);
+        boolean canZ = canWalkThrough(x, y, z + dz);
+        if (!canX && !canZ) return false;
+
+        float cost;
+        if (canX && canZ) cost = 1;
+        else cost = 2.5f;
+
+        return move(x + dx, y, z + dz, cost);
+    }
+
+    private boolean checkStep(boolean up, int dx, int dz, float cost) {
+        if (up) {
+            if (ctx.canWalkOn(x + dx, y - 2, z) && canWalkThrough(x + dx, y - 1, z + dz)) return move(x + dx, y - 1, z + dz, cost);
+        }
+        else {
+            if (ctx.canWalkOn(x + dx, y, z + dz) && canWalkThrough(x + dx, y + 1, z + dz)) return move(x + dx, y + 1, z + dz, cost);
+        }
+
+        return false;
+    }
+
+    private boolean checkJump1(int dx, int dz) {
+        if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
+
+        if (!ctx.canWalkOn(x + dx / 2, y - 1, z + dz / 2) && canWalkThrough(x + dx / 2, y, z + dz / 2)) return move(x + dx, y, z + dz, 3.25f);
+
+        return false;
+    }
+
+    private boolean canWalkThrough(int x, int y, int z) {
         return ctx.canWalkThrough(x, y, z) && ctx.canWalkThrough(x, y + 1, z);
+    }
+
+    private boolean move(int x, int y, int z, float cost) {
+        moveX = x;
+        moveY = y;
+        moveZ = z;
+        moveCost = cost;
+        return true;
     }
 }

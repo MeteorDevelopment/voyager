@@ -29,7 +29,6 @@ public class Voyager {
     private static Context ctx;
 
     private static BlockPos start, end;
-    private static final List<Move> moves = new ArrayList<>();
 
     private static final List<Node> path = new ArrayList<>();
     private static Input prevInput;
@@ -65,7 +64,7 @@ public class Voyager {
         nodes.put(BlockPos.asLong(startNode.x, startNode.y, startNode.z), startNode);
         openSet.enqueue(startNode);
 
-        List<Move> moves = new ArrayList<>();
+        MoveGenerator moves = new MoveGenerator(ctx);
         Node endedAt = null;
         int visited = 0;
 
@@ -78,17 +77,18 @@ public class Voyager {
                 break;
             }
 
-            MoveGenerator.generate(ctx, current.x, current.y, current.z, moves);
-            for (Move move : moves) {
-                long key = BlockPos.asLong(move.x(), move.y(), move.z());
+            moves.set(current.x, current.y, current.z);
+            while (moves.hasNext()) {
+                if (!moves.next()) continue;
+                long key = BlockPos.asLong(moves.moveX, moves.moveY, moves.moveZ);
 
                 Node node = nodes.get(key);
                 if (node != null) continue;
 
-                node = new Node(move.x(), move.y(), move.z());
+                node = new Node(moves.moveX, moves.moveY, moves.moveZ);
                 nodes.put(key, node);
 
-                float tentativeGScore = current.gScore + move.cost();
+                float tentativeGScore = current.gScore + moves.moveCost;
 
                 if (tentativeGScore < node.gScore) {
                     node.cameFrom = current;
@@ -99,7 +99,6 @@ public class Voyager {
                     if (!openSet.contains(node)) openSet.enqueue(node);
                 }
             }
-            moves.clear();
         }
 
         double elapsed = (System.nanoTime() - startTime) / 1000000000.0;
@@ -138,11 +137,14 @@ public class Voyager {
         int y = mc.player.getBlockY();
         int z = mc.player.getBlockZ();
 
-        MoveGenerator.generate(ctx, x, y, z, moves);
+        MoveGenerator moves = new MoveGenerator(ctx);
         renderer.begin(matrices, false, false);
 
-        for (Move move : moves) {
-            renderer.line(x + 0.5, y + 0.5, z + 0.5, move.x() + 0.5, move.y() + 0.5, move.z() + 0.5, lineColor);
+        moves.set(x, y, z);
+        while (moves.hasNext()) {
+            if (!moves.next()) continue;
+
+            renderer.line(x + 0.5, y + 0.5, z + 0.5, moves.moveX + 0.5, moves.moveY + 0.5, moves.moveZ + 0.5, lineColor);
         }
 
         if (start != null) renderer.box(start.getX() + 0.4, start.getY() + 0.4, start.getZ() + 0.4, 0.2, startColor);
@@ -160,7 +162,6 @@ public class Voyager {
         }
 
         renderer.end();
-        moves.clear();
     }
 
     public static void stopMovement() {
