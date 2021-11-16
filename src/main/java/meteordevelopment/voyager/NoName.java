@@ -4,11 +4,9 @@ import meteordevelopment.voyager.goals.XYZGoal;
 import meteordevelopment.voyager.pathfinder.Node;
 import meteordevelopment.voyager.utils.Color;
 import meteordevelopment.voyager.utils.Renderer;
-import net.minecraft.client.input.Input;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static meteordevelopment.voyager.Voyager.mc;
@@ -23,28 +21,11 @@ public class NoName {
 
     private static BlockPos start, end;
 
-    private static List<Node> path = new ArrayList<>();
-    private static Input prevInput;
-
     private static void findPath() {
         if (end == null) return;
 
-        stopMovement();
-
-        BlockPos start = NoName.start != null ? NoName.start : mc.player.getBlockPos();
-        path = Voyager.INSTANCE.findPath(start, new XYZGoal(end));
-
-        if (NoName.start == null) {
-            prevInput = mc.player.input;
-            mc.player.input = new VInput(path);
-        }
-    }
-
-    public static void stopMovement() {
-        if (prevInput != null) {
-            mc.player.input = prevInput;
-            prevInput = null;
-        }
+        if (start != null) Voyager.INSTANCE.findPath(start, new XYZGoal(end));
+        else Voyager.INSTANCE.moveTo(new XYZGoal(end));
     }
 
     public static void render(MatrixStack matrices) {
@@ -65,6 +46,7 @@ public class NoName {
         if (start != null) renderer.box(start.getX() + 0.4, start.getY() + 0.4, start.getZ() + 0.4, 0.2, startColor);
         if (end != null) renderer.box(end.getX() + 0.4, end.getY() + 0.4, end.getZ() + 0.4, 0.2, endColor);
 
+        List<Node> path = Voyager.INSTANCE.getLastPath();
         if (path.size() > 0) {
             Node first = path.get(0);
 
@@ -82,7 +64,7 @@ public class NoName {
     public static boolean onKey(int key) {
         return switch (key) {
             case GLFW_KEY_KP_0 -> {
-                stopMovement();
+                Voyager.INSTANCE.stop();
                 yield true;
             }
             case GLFW_KEY_KP_4 -> {
@@ -110,12 +92,12 @@ public class NoName {
                 yield true;
             }
             case GLFW_KEY_KP_8 -> {
-                path.clear();
+                Voyager.INSTANCE.getLastPath().clear();
                 yield true;
             }
             case GLFW_KEY_KP_9 -> {
                 start = end = null;
-                path.clear();
+                Voyager.INSTANCE.getLastPath().clear();
                 yield true;
             }
             default -> false;

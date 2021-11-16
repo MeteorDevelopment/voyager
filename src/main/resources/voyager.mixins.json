@@ -9,7 +9,9 @@
     "CameraMixin",
     "EntityMixin",
     "GameRendererMixin",
-    "MinecraftClientMixin"
+    "MinecraftClientMixin",
+    "CommandSuggestorMixin",
+    "ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

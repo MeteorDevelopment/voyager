@@ -5,6 +5,12 @@ import net.minecraft.util.math.BlockPos;
 public class XYZGoal implements IGoal {
     private final int x, y, z;
 
+    public XYZGoal(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
     public XYZGoal(BlockPos pos) {
         this.x = pos.getX();
         this.y = pos.getY();

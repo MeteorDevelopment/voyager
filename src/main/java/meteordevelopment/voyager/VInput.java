@@ -171,7 +171,7 @@ public class VInput extends Input {
         if (modifiedZ) velocity.z = 0;
 
         if (stop) {
-            NoName.stopMovement();
+            Voyager.INSTANCE.stop();
             mc.player.setYaw(yaw);
         }
     }
