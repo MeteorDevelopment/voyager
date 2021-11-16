@@ -1,5 +1,7 @@
 package meteordevelopment.voyager;
 
+import meteordevelopment.voyager.pathfinder.Node;
+import meteordevelopment.voyager.pathfinder.Path;
 import meteordevelopment.voyager.utils.Utils;
 import net.minecraft.client.input.Input;
 import net.minecraft.util.math.MathHelper;
@@ -169,7 +171,7 @@ public class VInput extends Input {
         if (modifiedZ) velocity.z = 0;
 
         if (stop) {
-            Voyager.stopMovement();
+            NoName.stopMovement();
             mc.player.setYaw(yaw);
         }
     }

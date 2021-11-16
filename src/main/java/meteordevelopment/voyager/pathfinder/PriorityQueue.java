@@ -1,4 +1,4 @@
-package meteordevelopment.voyager;
+package meteordevelopment.voyager.pathfinder;
 
 import it.unimi.dsi.fastutil.objects.ObjectHeapPriorityQueue;
 

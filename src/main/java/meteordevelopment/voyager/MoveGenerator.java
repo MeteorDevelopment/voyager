@@ -1,7 +1,14 @@
 package meteordevelopment.voyager;
 
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+
+import static meteordevelopment.voyager.Voyager.mc;
+
 public class MoveGenerator {
-    private final Context ctx;
+    private static final BlockPos.Mutable pos = new BlockPos.Mutable();
+
+    private final IWorldInterface wi;
     private int x, y, z;
     private int moveI;
 
@@ -9,8 +16,8 @@ public class MoveGenerator {
     public boolean moveOutside;
     public float moveCost;
 
-    public MoveGenerator(Context ctx) {
-        this.ctx = ctx;
+    public MoveGenerator(IWorldInterface wi) {
+        this.wi = wi;
     }
 
     public void set(int x, int y, int z) {
@@ -61,16 +68,16 @@ public class MoveGenerator {
     }
 
     private boolean checkStraight(int dx, int dz) {
-        if (ctx.isOutside(x + dx, z + dz)) return outside();
+        if (wi.isOutside(x + dx, z + dz)) return outside();
 
-        if (ctx.canWalkOn(x + dx, y - 1, z + dz) && canWalkThrough(x + dx, y, z + dz)) return move(x + dx, y, z + dz, 1);
+        if (canWalkOn(x + dx, y - 1, z + dz) && canWalkThrough(x + dx, y, z + dz)) return move(x + dx, y, z + dz, 1);
         return false;
     }
 
     private boolean checkDiagonal(int dx, int dz) {
-        if (ctx.isOutside(x + dx, z + dz)) return outside();
+        if (wi.isOutside(x + dx, z + dz)) return outside();
 
-        if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
+        if (!canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
 
         boolean canX = canWalkThrough(x + dx, y, z);
         boolean canZ = canWalkThrough(x, y, z + dz);
@@ -84,30 +91,48 @@ public class MoveGenerator {
     }
 
     private boolean checkStep(boolean up, int dx, int dz, float cost) {
-        if (ctx.isOutside(x + dx, z + dz)) return outside();
+        if (wi.isOutside(x + dx, z + dz)) return outside();
 
         if (up) {
-            if (ctx.canWalkOn(x + dx, y - 2, z) && canWalkThrough(x + dx, y - 1, z + dz)) return move(x + dx, y - 1, z + dz, cost);
+            if (canWalkOn(x + dx, y - 2, z) && canWalkThrough(x + dx, y - 1, z + dz)) return move(x + dx, y - 1, z + dz, cost);
         }
         else {
-            if (ctx.canWalkOn(x + dx, y, z + dz) && canWalkThrough(x + dx, y + 1, z + dz)) return move(x + dx, y + 1, z + dz, cost);
+            if (canWalkOn(x + dx, y, z + dz) && canWalkThrough(x + dx, y + 1, z + dz)) return move(x + dx, y + 1, z + dz, cost);
         }
 
         return false;
     }
 
     private boolean checkJump1(int dx, int dz) {
-        if (ctx.isOutside(x + dx, z + dz)) return outside();
+        if (wi.isOutside(x + dx, z + dz)) return outside();
 
-        if (!ctx.canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
+        if (!canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
 
-        if (!ctx.canWalkOn(x + dx / 2, y - 1, z + dz / 2) && canWalkThrough(x + dx / 2, y, z + dz / 2)) return move(x + dx, y, z + dz, 3.25f);
+        if (!canWalkOn(x + dx / 2, y - 1, z + dz / 2) && canWalkThrough(x + dx / 2, y, z + dz / 2)) return move(x + dx, y, z + dz, 3.25f);
 
         return false;
     }
 
     private boolean canWalkThrough(int x, int y, int z) {
-        return ctx.canWalkThrough(x, y, z) && ctx.canWalkThrough(x, y + 1, z);
+        return canWalkThroughBlock(x, y, z) && canWalkThroughBlock(x, y + 1, z);
+    }
+
+    private boolean canWalkThroughBlock(int x, int y, int z) {
+        BlockState state = wi.getBlockState(x, y, z);
+
+        if (state.isAir()) return true;
+        if (!state.getFluidState().isEmpty()) return false;
+
+        return state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
+    }
+
+    private boolean canWalkOn(int x, int y, int z) {
+        BlockState state = wi.getBlockState(x, y, z);
+
+        if (state.isAir()) return false;
+        if (!state.getFluidState().isEmpty()) return false;
+
+        return !state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
     }
 
     private boolean move(int x, int y, int z, float cost) {

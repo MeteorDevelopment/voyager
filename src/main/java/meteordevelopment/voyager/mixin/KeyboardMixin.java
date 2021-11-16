@@ -1,6 +1,6 @@
 package meteordevelopment.voyager.mixin;
 
-import meteordevelopment.voyager.Voyager;
+import meteordevelopment.voyager.NoName;
 import net.minecraft.client.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ public class KeyboardMixin {
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo info) {
         if (action == GLFW_PRESS && mc.currentScreen == null) {
-            if (Voyager.onKey(key)) info.cancel();
+            if (NoName.onKey(key)) info.cancel();
         }
     }
 }

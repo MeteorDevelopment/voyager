@@ -1,4 +1,4 @@
-package meteordevelopment.voyager;
+package meteordevelopment.voyager.pathfinder;
 
 import java.util.ArrayList;
 import java.util.List;

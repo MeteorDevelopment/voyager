@@ -1,4 +1,4 @@
-package meteordevelopment.voyager;
+package meteordevelopment.voyager.pathfinder;
 
 public class Node {
     public final int x, y, z;

@@ -1,7 +1,7 @@
 package meteordevelopment.voyager.mixin;
 
+import meteordevelopment.voyager.NoName;
 import meteordevelopment.voyager.VInput;
-import meteordevelopment.voyager.Voyager;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -22,7 +22,7 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "renderWorld", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = { "ldc=hand" }))
     private void onRenderWorld(float tickDelta, long limitTime, MatrixStack matrix, CallbackInfo info) {
-        Voyager.render(matrix);
+        NoName.render(matrix);
     }
 
     @Inject(method = "updateTargetedEntity", at = @At("HEAD"), cancellable = true)
