@@ -2,8 +2,8 @@ package meteordevelopment.voyager.pathfinder;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import meteordevelopment.voyager.IWorldInterface;
 import meteordevelopment.voyager.MoveGenerator;
+import meteordevelopment.voyager.Voyager;
 import meteordevelopment.voyager.goals.IGoal;
 import meteordevelopment.voyager.utils.Chat;
 import net.minecraft.util.math.BlockPos;
@@ -14,8 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Pathfinder {
-    public static List<Node> findPath(IWorldInterface wi, BlockPos start, IGoal goal) {
-        Chat.send("Calculating path");
+    public static List<Node> findPath(Voyager voyager, BlockPos start, IGoal goal) {
+        if (voyager.getSettings().chatDebug.get()) Chat.send("Calculating path");
 
         long startTime = System.nanoTime();
 
@@ -28,7 +28,7 @@ public class Pathfinder {
         nodes.put(BlockPos.asLong(startNode.x, startNode.y, startNode.z), startNode);
         openSet.enqueue(startNode);
 
-        MoveGenerator moves = new MoveGenerator(wi);
+        MoveGenerator moves = new MoveGenerator(voyager.getWorldInterface());
         Node endedAt = null;
         int visited = 0;
         int outsideHits = 0;
@@ -74,9 +74,11 @@ public class Pathfinder {
             }
         }
 
-        double elapsed = (System.nanoTime() - startTime) / 1000000000.0;
-        Chat.send("Finished calculating path in %.3f s" + (endedAt == null ? ", no path" : ""), elapsed);
-        Chat.send("  Nodes: %d, Visited: %d, Outside hits: %d", nodes.size(), visited, outsideHits);
+        if (voyager.getSettings().chatDebug.get()) {
+            double elapsed = (System.nanoTime() - startTime) / 1000000000.0;
+            Chat.send("Finished calculating path in %.3f s" + (endedAt == null ? ", no path" : ""), elapsed);
+            Chat.send("  Nodes: %d, Visited: %d, Outside hits: %d", nodes.size(), visited, outsideHits);
+        }
 
         List<Node> path = new ArrayList<>();
 

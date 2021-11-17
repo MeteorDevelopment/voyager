@@ -14,6 +14,7 @@ public class Commands {
     public static final CommandSource COMMAND_SOURCE = new ClientCommandSource(null, mc);
 
     public static void init() {
+        add(new SettingsCommand());
         add(new GotoCommand());
     }
 

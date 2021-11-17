@@ -2,7 +2,9 @@ package meteordevelopment.voyager;
 
 import meteordevelopment.voyager.goals.XYZGoal;
 import meteordevelopment.voyager.pathfinder.Node;
+import meteordevelopment.voyager.settings.Settings;
 import meteordevelopment.voyager.utils.Color;
+import meteordevelopment.voyager.utils.RenderPath;
 import meteordevelopment.voyager.utils.Renderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
@@ -17,7 +19,6 @@ public class NoName {
     private static final Color lineColor = new Color(255, 255, 255, 50);
     private static final Color startColor = new Color(25, 25, 225, 175);
     private static final Color endColor = new Color(225, 25, 25, 175);
-    private static final Color pathColor = new Color(25, 225, 25, 255);
 
     private static BlockPos start, end;
 
@@ -33,28 +34,35 @@ public class NoName {
         int y = mc.player.getBlockY();
         int z = mc.player.getBlockZ();
 
-        MoveGenerator moves = new MoveGenerator(Voyager.INSTANCE.getWorldInterface());
+        Settings settings = Voyager.INSTANCE.getSettings();
         renderer.begin(matrices, false, false);
 
-        moves.set(x, y, z);
-        while (moves.hasNext()) {
-            if (!moves.next()) continue;
+        if (settings.renderPossibleMoves.get()) {
+            MoveGenerator moves = new MoveGenerator(Voyager.INSTANCE.getWorldInterface());
 
-            renderer.line(x + 0.5, y + 0.5, z + 0.5, moves.moveX + 0.5, moves.moveY + 0.5, moves.moveZ + 0.5, lineColor);
+            moves.set(x, y, z);
+            while (moves.hasNext()) {
+                if (!moves.next()) continue;
+
+                renderer.line(x + 0.5, y + 0.5, z + 0.5, moves.moveX + 0.5, moves.moveY + 0.5, moves.moveZ + 0.5, lineColor);
+            }
         }
 
         if (start != null) renderer.box(start.getX() + 0.4, start.getY() + 0.4, start.getZ() + 0.4, 0.2, startColor);
         if (end != null) renderer.box(end.getX() + 0.4, end.getY() + 0.4, end.getZ() + 0.4, 0.2, endColor);
 
-        List<Node> path = Voyager.INSTANCE.getLastPath();
-        if (path.size() > 0) {
-            Node first = path.get(0);
+        if (settings.renderPath.get() == RenderPath.Always || (settings.renderPath.get() == RenderPath.OnlyWhenMoving && Voyager.INSTANCE.isMoving())) {
+            List<Node> path = Voyager.INSTANCE.getLastPath();
 
-            for (int i = 1; i < path.size(); i++) {
-                Node second = path.get(i);
+            if (path.size() > 0) {
+                Node first = path.get(0);
 
-                renderer.line(first.x + 0.5, first.y + 0.5, first.z + 0.5, second.x + 0.5, second.y + 0.5, second.z + 0.5, pathColor);
-                first = second;
+                for (int i = 1; i < path.size(); i++) {
+                    Node second = path.get(i);
+
+                    renderer.line(first.x + 0.5, first.y + 0.5, first.z + 0.5, second.x + 0.5, second.y + 0.5, second.z + 0.5, settings.pathColor.get());
+                    first = second;
+                }
             }
         }
 

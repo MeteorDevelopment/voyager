@@ -13,6 +13,9 @@
   "license": "GPL-3.0",
   "icon": "assets/pathfinder/icon.png",
   "environment": "client",
+  "entrypoints": {
+    "modmenu": [ "meteordevelopment.voyager.ModMenuIntegration" ]
+  },
   "mixins": [
     "voyager.mixins.json"
   ],
