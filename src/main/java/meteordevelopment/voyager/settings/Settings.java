@@ -29,6 +29,10 @@ public class Settings {
         load();
     }
 
+    // General
+    private final String general = "General";
+    public final Setting<String> prefix = add(new StringSetting(general, "prefix", "Prefix", "Chat commands prefix.", true, "-"));
+
     // Render
     private final String render = "Render";
     public final Setting<RenderPath> renderPath = add(new EnumSetting<>(render, "render-path", "Render path", "When to render path.", RenderPath.OnlyWhenMoving));

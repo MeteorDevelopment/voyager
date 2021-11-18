@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.suggestion.Suggestions;
+import meteordevelopment.voyager.Voyager;
 import meteordevelopment.voyager.commands.Commands;
 import net.minecraft.client.gui.screen.CommandSuggestor;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -23,11 +24,11 @@ import java.util.concurrent.CompletableFuture;
 public abstract class CommandSuggestorMixin {
     @Shadow private @Nullable ParseResults<CommandSource> parse;
 
-    @Shadow @Final private TextFieldWidget textField;
+    @Shadow @Final TextFieldWidget textField;
 
-    @Shadow @Nullable private CommandSuggestor.@Nullable SuggestionWindow window;
+    @Shadow @Nullable CommandSuggestor.@Nullable SuggestionWindow window;
 
-    @Shadow private boolean completingSuggestions;
+    @Shadow boolean completingSuggestions;
 
     @Shadow private @Nullable CompletableFuture<Suggestions> pendingSuggestions;
 
@@ -35,8 +36,10 @@ public abstract class CommandSuggestorMixin {
 
     @Inject(method = "refresh", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/StringReader;canRead()Z"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private void onRefresh(CallbackInfo info, String string, StringReader reader) {
-        if (reader.canRead(1) && reader.getString().startsWith("-", reader.getCursor())) {
-            reader.setCursor(reader.getCursor() + 1);
+        String prefix = Voyager.INSTANCE.getSettings().prefix.get();
+
+        if (reader.canRead(prefix.length()) && reader.getString().startsWith(prefix, reader.getCursor())) {
+            reader.setCursor(reader.getCursor() + prefix.length());
 
             CommandDispatcher<CommandSource> commandDispatcher = Commands.DISPATCHER;
             if (this.parse == null) {
