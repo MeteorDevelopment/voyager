@@ -1,15 +1,13 @@
 package meteordevelopment.voyager;
 
 import meteordevelopment.voyager.goals.XYZGoal;
-import meteordevelopment.voyager.pathfinder.Node;
+import meteordevelopment.voyager.pathfinder.Path;
 import meteordevelopment.voyager.settings.Settings;
 import meteordevelopment.voyager.utils.Color;
 import meteordevelopment.voyager.utils.RenderPath;
 import meteordevelopment.voyager.utils.Renderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.List;
 
 import static meteordevelopment.voyager.Voyager.mc;
 import static org.lwjgl.glfw.GLFW.*;
@@ -52,16 +50,14 @@ public class NoName {
         if (end != null) renderer.box(end.getX() + 0.4, end.getY() + 0.4, end.getZ() + 0.4, 0.2, endColor);
 
         if (settings.renderPath.get() == RenderPath.Always || (settings.renderPath.get() == RenderPath.OnlyWhenMoving && Voyager.INSTANCE.isMoving())) {
-            List<Node> path = Voyager.INSTANCE.getLastPath();
+            if (Voyager.INSTANCE.getLastPath().isValid()) {
+                Path.Step step = Voyager.INSTANCE.getLastPath().start();
 
-            if (path.size() > 0) {
-                Node first = path.get(0);
+                while (step.next != null) {
+                    Path.Step next = step.next;
 
-                for (int i = 1; i < path.size(); i++) {
-                    Node second = path.get(i);
-
-                    renderer.line(first.x + 0.5, first.y + 0.5, first.z + 0.5, second.x + 0.5, second.y + 0.5, second.z + 0.5, settings.pathColor.get());
-                    first = second;
+                    renderer.line(step.x + 0.5, step.y + 0.5, step.z + 0.5, next.x + 0.5, next.y + 0.5, next.z + 0.5, settings.pathColor.get());
+                    step = next;
                 }
             }
         }
@@ -97,15 +93,6 @@ public class NoName {
             }
             case GLFW_KEY_KP_7 -> {
                 start = end = null;
-                yield true;
-            }
-            case GLFW_KEY_KP_8 -> {
-                Voyager.INSTANCE.getLastPath().clear();
-                yield true;
-            }
-            case GLFW_KEY_KP_9 -> {
-                start = end = null;
-                Voyager.INSTANCE.getLastPath().clear();
                 yield true;
             }
             default -> false;

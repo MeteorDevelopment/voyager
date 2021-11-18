@@ -1,31 +1,27 @@
 package meteordevelopment.voyager;
 
-import meteordevelopment.voyager.pathfinder.Node;
 import meteordevelopment.voyager.pathfinder.Path;
 import meteordevelopment.voyager.utils.Utils;
 import net.minecraft.client.input.Input;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.List;
-
 import static meteordevelopment.voyager.Voyager.mc;
 
 public class VInput extends Input {
-    private final List<Node> path;
-    private Node current, next;
+    private final Path path;
+    private Path.Step current, next;
     private boolean isNew;
-    private int i;
 
     private boolean waitForGround;
     private float yaw, prevYaw;
 
-    public VInput(List<Node> path) {
+    public VInput(Path path) {
         this.path = path;
 
         prevYaw = yaw = mc.player.getYaw();
 
-        next();
+        next = path.start();
         mc.player.setYaw(getNextYaw());
     }
 
@@ -96,10 +92,10 @@ public class VInput extends Input {
     }
 
     private boolean next() {
-        if (i >= path.size()) return false;
+        if (next.next == null) return false;
 
         current = next;
-        next = path.get(i++);
+        next = next.next;
         isNew = true;
 
         return true;
@@ -116,9 +112,6 @@ public class VInput extends Input {
 
         double nextX = next.x + 0.5;
         double nextZ = next.z + 0.5;
-
-        double dx = Math.abs(x - nextX);
-        double dz = Math.abs(z - nextZ);
 
         Vec3d vec2 = new Vec3d(vec.x, vec.y, vec.z);
 
@@ -148,11 +141,11 @@ public class VInput extends Input {
 
         double distance = getDistanceToNext(vec2);
         if (distance <= 0.01) {
-            Node prev = current;
+            Path.Step prev = current;
 
             if (!next()) stop = true;
             else if (prev != null) {
-                if (current.y == next.y && current.x + Path.getDirX(prev, current) == next.x&& current.z+ Path.getDirZ(prev, current) == next.z) return;
+                if (current.y == next.y && current.x + prev.getDirX(current) == next.x&& current.z+ prev.getDirZ(current) == next.z) return;
             }
         }
 
@@ -173,6 +166,8 @@ public class VInput extends Input {
         if (stop) {
             Voyager.INSTANCE.stop();
             mc.player.setYaw(yaw);
+
+            path.continueIfNeeded();
         }
     }
 

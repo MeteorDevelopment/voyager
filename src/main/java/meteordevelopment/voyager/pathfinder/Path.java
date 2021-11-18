@@ -1,10 +1,39 @@
 package meteordevelopment.voyager.pathfinder;
 
-import java.util.ArrayList;
-import java.util.List;
+import meteordevelopment.voyager.Voyager;
+import meteordevelopment.voyager.goals.IGoal;
 
-public class Path {
-    public static List<Node> simplify(List<Node> oldPath) {
+public record Path(Voyager voyager, Step start, IGoal goal) {
+    public static class Step {
+        public final int x, y, z;
+        public Step next;
+
+        public Step(int x, int y, int z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public int getDirX(Step to) {
+            if (x == to.x) return 0;
+            return to.x > x ? 1 : -1;
+        }
+
+        public int getDirZ(Step to) {
+            if (z == to.z) return 0;
+            return to.z > z ? 1 : -1;
+        }
+    }
+
+    public boolean isValid() {
+        return start != null;
+    }
+
+    public void continueIfNeeded() {
+        if (goal != null) voyager.moveTo(goal);
+    }
+
+    /*public static List<Node> simplify(List<Node> oldPath) {
         if (oldPath.size() <= 2) return oldPath;
 
         List<Node> path = new ArrayList<>(oldPath.size());
@@ -59,15 +88,5 @@ public class Path {
         if (last != null) path.add(last);
 
         return path;
-    }
-
-    public static int getDirX(Node from, Node to) {
-        if (from.x == to.x) return 0;
-        return to.x > from.x ? 1 : -1;
-    }
-
-    public static int getDirZ(Node from, Node to) {
-        if (from.z == to.z) return 0;
-        return to.z > from.z ? 1 : -1;
-    }
+    }*/
 }

@@ -8,13 +8,10 @@ import meteordevelopment.voyager.goals.IGoal;
 import meteordevelopment.voyager.utils.Chat;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 public class Pathfinder {
-    public static List<Node> findPath(Voyager voyager, BlockPos start, IGoal goal) {
+    public static Path findPath(Voyager voyager, BlockPos start, IGoal goal) {
         if (voyager.getSettings().chatDebug.get()) Chat.send("Calculating path");
 
         long startTime = System.nanoTime();
@@ -32,6 +29,7 @@ public class Pathfinder {
         Node endedAt = null;
         int visited = 0;
         int outsideHits = 0;
+        boolean shouldContinue = false;
 
         loop:
         while (openSet.size() > 0) {
@@ -48,6 +46,7 @@ public class Pathfinder {
                 if (!moves.next()) {
                     if (moves.moveOutside && ++outsideHits >= 50) {
                         endedAt = current;
+                        shouldContinue = true;
                         break loop;
                     }
                     continue;
@@ -80,20 +79,20 @@ public class Pathfinder {
             Chat.send("  Nodes: %d, Visited: %d, Outside hits: %d", nodes.size(), visited, outsideHits);
         }
 
-        List<Node> path = new ArrayList<>();
+        Path.Step step = null;
 
         if (endedAt != null) {
-            path.add(endedAt);
+            step = new Path.Step(endedAt.x, endedAt.y, endedAt.z);
 
             while (endedAt.cameFrom != null) {
                 endedAt = endedAt.cameFrom;
-                path.add(endedAt);
-            }
 
-            Collections.reverse(path);
-            //path = Path.simplify(path);
+                Path.Step next = new Path.Step(endedAt.x, endedAt.y, endedAt.z);
+                next.next = step;
+                step = next;
+            }
         }
 
-        return path;
+        return new Path(voyager, step, shouldContinue ? goal : null);
     }
 }
