@@ -16,6 +16,7 @@ public class Commands {
     public static void init() {
         add(new SettingsCommand());
         add(new GotoCommand());
+        add(new ThiswayCommand());
         add(new StopCommand());
     }
 
