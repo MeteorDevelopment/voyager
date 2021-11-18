@@ -1,16 +1,22 @@
 package meteordevelopment.voyager;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 import static meteordevelopment.voyager.Voyager.mc;
 
 public class MoveGenerator {
+    private static final Block[] BLOCKS_THAT_MAKE_YOU_GO_OUCH = { Blocks.CACTUS, Blocks.FIRE, Blocks.SOUL_FIRE, Blocks.SWEET_BERRY_BUSH, Blocks.LAVA, Blocks.CAMPFIRE, Blocks.SOUL_CAMPFIRE };
+
     private static final BlockPos.Mutable pos = new BlockPos.Mutable();
 
     private final IWorldInterface wi;
     private int x, y, z;
     private int moveI;
+
+    private boolean canWalkThroughDidHurt;
 
     public MoveType moveType;
     public int moveX, moveY, moveZ;
@@ -86,7 +92,11 @@ public class MoveGenerator {
         if (!canStandIn(x + dx, y, z + dz)) return false;
 
         boolean canX = canWalkThrough(x + dx, y, z, 2);
+        if (canWalkThroughDidHurt) return false;
+
         boolean canZ = canWalkThrough(x, y, z + dz, 2);
+        if (canWalkThroughDidHurt) return false;
+
         if (!canX && !canZ) return false;
 
         if (canX && canZ) return move(MoveType.Straight, x + dx, y, z + dz, 1);
@@ -132,11 +142,18 @@ public class MoveGenerator {
 
         if (state.isAir()) return false;
         if (!state.getFluidState().isEmpty()) return false;
+        if (state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty()) return false;
 
-        return !state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
+        for (Block block : BLOCKS_THAT_MAKE_YOU_GO_OUCH) {
+            if (state.getBlock() == block) return false;
+        }
+
+        return true;
     }
 
     private boolean canWalkThrough(int x, int y, int z, int height) {
+        canWalkThroughDidHurt = false;
+
         for (int i = 0; i < height; i++) {
             if (!canWalkThrough(x, y + i, z)) return false;
         }
@@ -148,6 +165,14 @@ public class MoveGenerator {
         BlockState state = wi.getBlockState(x, y, z);
 
         if (state.isAir()) return true;
+
+        for (Block block : BLOCKS_THAT_MAKE_YOU_GO_OUCH) {
+            if (state.getBlock() == block) {
+                canWalkThroughDidHurt = true;
+                return false;
+            }
+        }
+
         if (!state.getFluidState().isEmpty()) return false;
 
         return state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
