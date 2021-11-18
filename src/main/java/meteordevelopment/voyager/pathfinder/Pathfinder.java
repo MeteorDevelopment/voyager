@@ -64,6 +64,7 @@ public class Pathfinder {
 
                 if (tentativeGScore < node.gScore) {
                     node.cameFrom = current;
+                    node.moveType = moves.moveType;
 
                     node.gScore = tentativeGScore;
                     node.fScore = node.gScore + goal.heuristic(node);
@@ -82,12 +83,12 @@ public class Pathfinder {
         Path.Step step = null;
 
         if (endedAt != null) {
-            step = new Path.Step(endedAt.x, endedAt.y, endedAt.z);
+            step = new Path.Step(endedAt.moveType, endedAt.x, endedAt.y, endedAt.z);
 
             while (endedAt.cameFrom != null) {
                 endedAt = endedAt.cameFrom;
 
-                Path.Step next = new Path.Step(endedAt.x, endedAt.y, endedAt.z);
+                Path.Step next = new Path.Step(endedAt.moveType, endedAt.x, endedAt.y, endedAt.z);
                 next.next = step;
                 step = next;
             }

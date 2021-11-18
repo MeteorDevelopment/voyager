@@ -1,14 +1,18 @@
 package meteordevelopment.voyager.pathfinder;
 
+import meteordevelopment.voyager.MoveType;
 import meteordevelopment.voyager.Voyager;
 import meteordevelopment.voyager.goals.IGoal;
 
 public record Path(Voyager voyager, Step start, IGoal goal) {
     public static class Step {
+        public final MoveType type;
         public final int x, y, z;
+
         public Step next;
 
-        public Step(int x, int y, int z) {
+        public Step(MoveType type, int x, int y, int z) {
+            this.type = type;
             this.x = x;
             this.y = y;
             this.z = z;

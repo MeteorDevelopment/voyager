@@ -1,11 +1,14 @@
 package meteordevelopment.voyager.pathfinder;
 
+import meteordevelopment.voyager.MoveType;
+
 public class Node {
     public final int x, y, z;
     public float gScore = Float.POSITIVE_INFINITY;
     public float fScore = Float.POSITIVE_INFINITY;
 
     public Node cameFrom;
+    public MoveType moveType;
 
     public Node(int x, int y, int z) {
         this.x = x;

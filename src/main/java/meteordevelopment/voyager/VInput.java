@@ -52,7 +52,7 @@ public class VInput extends Input {
 
         if (isNew) {
             // Jump or Jump1
-            if (is(1, 1) || is(2, 0)) {
+            if (next.type == MoveType.Jump || next.type == MoveType.Jump1) {
                 if (!mc.player.isOnGround()) {
                     waitForGround = true;
                     return;
@@ -68,16 +68,6 @@ public class VInput extends Input {
 
         isNew = false;
         tickBase();
-    }
-
-    private boolean is(int h, int y) {
-        if (current == null || next.y != current.y + y) return false;
-
-        double dx = next.x - current.x;
-        double dz = next.z - current.z;
-        double dist = Math.sqrt(dx * dx + dz * dz);
-
-        return dist == h;
     }
 
     private float getNextYaw() {

@@ -12,6 +12,7 @@ public class MoveGenerator {
     private int x, y, z;
     private int moveI;
 
+    public MoveType moveType;
     public int moveX, moveY, moveZ;
     public boolean moveOutside;
     public float moveCost;
@@ -25,6 +26,8 @@ public class MoveGenerator {
         this.y = y;
         this.z = z;
         this.moveI = 0;
+
+        if (!canStandIn(x, y, z)) moveI = Integer.MAX_VALUE;
     }
 
     public boolean hasNext() {
@@ -67,37 +70,39 @@ public class MoveGenerator {
         };
     }
 
+    // Checking methods
+
     private boolean checkStraight(int dx, int dz) {
         if (wi.isOutside(x + dx, z + dz)) return outside();
 
-        if (canWalkOn(x + dx, y - 1, z + dz) && canWalkThrough(x + dx, y, z + dz)) return move(x + dx, y, z + dz, 1);
-        return false;
+        if (!canStandIn(x + dx, y, z + dz)) return false;
+
+        return move(MoveType.Straight, x + dx, y, z + dz, 1);
     }
 
     private boolean checkDiagonal(int dx, int dz) {
         if (wi.isOutside(x + dx, z + dz)) return outside();
 
-        if (!canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
+        if (!canStandIn(x + dx, y, z + dz)) return false;
 
-        boolean canX = canWalkThrough(x + dx, y, z);
-        boolean canZ = canWalkThrough(x, y, z + dz);
+        boolean canX = canWalkThrough(x + dx, y, z, 2);
+        boolean canZ = canWalkThrough(x, y, z + dz, 2);
         if (!canX && !canZ) return false;
 
-        float cost;
-        if (canX && canZ) cost = 1;
-        else cost = 2.5f;
-
-        return move(x + dx, y, z + dz, cost);
+        if (canX && canZ) return move(MoveType.Straight, x + dx, y, z + dz, 1);
+        return move(MoveType.CornerBump, x + dx, y, z + dz, 2.5f);
     }
 
     private boolean checkStep(boolean up, int dx, int dz, float cost) {
         if (wi.isOutside(x + dx, z + dz)) return outside();
 
         if (up) {
-            if (canWalkOn(x + dx, y - 2, z) && canWalkThrough(x + dx, y - 1, z + dz)) return move(x + dx, y - 1, z + dz, cost);
+            if (!canWalkThrough(x, y + 2, z)) return false;
+
+            if (canStandIn(x + dx, y + 1, z + dz)) return move(MoveType.Jump, x + dx, y + 1, z + dz, cost);
         }
         else {
-            if (canWalkOn(x + dx, y, z + dz) && canWalkThrough(x + dx, y + 1, z + dz)) return move(x + dx, y + 1, z + dz, cost);
+            if (canStandIn(x + dx, y - 1, z + dz, 3)) return move(MoveType.Straight, x + dx, y - 1, z + dz, cost);
         }
 
         return false;
@@ -106,25 +111,21 @@ public class MoveGenerator {
     private boolean checkJump1(int dx, int dz) {
         if (wi.isOutside(x + dx, z + dz)) return outside();
 
-        if (!canWalkOn(x + dx, y - 1, z + dz) || !canWalkThrough(x + dx, y, z + dz)) return false;
+        if (!canWalkThrough(x, y + 2, z)) return false;
+        if (canWalkOn(x + dx / 2, y - 1, z + dz / 2)) return false;
+        if (!canWalkThrough(x + dx / 2, y, z + dz / 2, 3)) return false;
+        if (!canStandIn(x + dx, y, z + dz, 3)) return false;
 
-        if (!canWalkOn(x + dx / 2, y - 1, z + dz / 2) && canWalkThrough(x + dx / 2, y, z + dz / 2)) return move(x + dx, y, z + dz, 3.25f);
-
-        return false;
+        return move(MoveType.Jump1, x + dx, y, z + dz, 3.25f);
     }
 
-    private boolean canWalkThrough(int x, int y, int z) {
-        return canWalkThroughBlock(x, y, z) && canWalkThroughBlock(x, y + 1, z);
+    // Helper methods
+
+    private boolean canStandIn(int x, int y, int z, int height) {
+        if (!canWalkOn(x, y - 1, z)) return false;
+        return canWalkThrough(x, y, z, height);
     }
-
-    private boolean canWalkThroughBlock(int x, int y, int z) {
-        BlockState state = wi.getBlockState(x, y, z);
-
-        if (state.isAir()) return true;
-        if (!state.getFluidState().isEmpty()) return false;
-
-        return state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
-    }
+    private boolean canStandIn(int x, int y, int z) { return canStandIn(x, y, z, 2); }
 
     private boolean canWalkOn(int x, int y, int z) {
         BlockState state = wi.getBlockState(x, y, z);
@@ -135,7 +136,25 @@ public class MoveGenerator {
         return !state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
     }
 
-    private boolean move(int x, int y, int z, float cost) {
+    private boolean canWalkThrough(int x, int y, int z, int height) {
+        for (int i = 0; i < height; i++) {
+            if (!canWalkThrough(x, y + i, z)) return false;
+        }
+
+        return true;
+    }
+
+    private boolean canWalkThrough(int x, int y, int z) {
+        BlockState state = wi.getBlockState(x, y, z);
+
+        if (state.isAir()) return true;
+        if (!state.getFluidState().isEmpty()) return false;
+
+        return state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
+    }
+
+    private boolean move(MoveType type, int x, int y, int z, float cost) {
+        moveType = type;
         moveX = x;
         moveY = y;
         moveZ = z;
