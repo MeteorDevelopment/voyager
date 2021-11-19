@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import static meteordevelopment.voyager.Voyager.mc;
 
 public class MoveGenerator {
-    private static final Block[] BLOCKS_THAT_MAKE_YOU_GO_OUCH = { Blocks.CACTUS, Blocks.FIRE, Blocks.SOUL_FIRE, Blocks.SWEET_BERRY_BUSH, Blocks.LAVA, Blocks.CAMPFIRE, Blocks.SOUL_CAMPFIRE };
+    private static final Block[] BLOCKS_THAT_MAKE_YOU_GO_OUCH = { Blocks.CACTUS, Blocks.FIRE, Blocks.SOUL_FIRE, Blocks.SWEET_BERRY_BUSH, Blocks.CAMPFIRE, Blocks.SOUL_CAMPFIRE };
 
     private static final BlockPos.Mutable pos = new BlockPos.Mutable();
 
@@ -16,7 +16,7 @@ public class MoveGenerator {
     private int x, y, z;
     private int moveI;
 
-    private boolean canWalkThroughDidHurt;
+    private boolean canWalkThroughDidHurtOrIdk;
 
     public MoveType moveType;
     public int moveX, moveY, moveZ;
@@ -91,11 +91,11 @@ public class MoveGenerator {
 
         if (!canStandIn(x + dx, y, z + dz)) return false;
 
-        boolean canX = canWalkThrough(x + dx, y, z, 2);
-        if (canWalkThroughDidHurt) return false;
+        boolean canX = canWalkThrough(x + dx, y, z, 2, true);
+        if (canWalkThroughDidHurtOrIdk) return false;
 
-        boolean canZ = canWalkThrough(x, y, z + dz, 2);
-        if (canWalkThroughDidHurt) return false;
+        boolean canZ = canWalkThrough(x, y, z + dz, 2, true);
+        if (canWalkThroughDidHurtOrIdk) return false;
 
         if (!canX && !canZ) return false;
 
@@ -135,7 +135,9 @@ public class MoveGenerator {
         if (!canWalkOn(x, y - 1, z)) return false;
         return canWalkThrough(x, y, z, height);
     }
-    private boolean canStandIn(int x, int y, int z) { return canStandIn(x, y, z, 2); }
+    private boolean canStandIn(int x, int y, int z) {
+        return canStandIn(x, y, z, 2);
+    }
 
     private boolean canWalkOn(int x, int y, int z) {
         BlockState state = wi.getBlockState(x, y, z);
@@ -151,31 +153,40 @@ public class MoveGenerator {
         return true;
     }
 
-    private boolean canWalkThrough(int x, int y, int z, int height) {
-        canWalkThroughDidHurt = false;
+    private boolean canWalkThrough(int x, int y, int z, int height, boolean setThingAtFluid) {
+        canWalkThroughDidHurtOrIdk = false;
 
         for (int i = 0; i < height; i++) {
-            if (!canWalkThrough(x, y + i, z)) return false;
+            if (!canWalkThrough(x, y + i, z, setThingAtFluid)) return false;
         }
 
         return true;
     }
+    private boolean canWalkThrough(int x, int y, int z, int height) {
+        return canWalkThrough(x, y, z, height, false);
+    }
 
-    private boolean canWalkThrough(int x, int y, int z) {
+    private boolean canWalkThrough(int x, int y, int z, boolean setThingAtFluid) {
         BlockState state = wi.getBlockState(x, y, z);
 
         if (state.isAir()) return true;
 
         for (Block block : BLOCKS_THAT_MAKE_YOU_GO_OUCH) {
             if (state.getBlock() == block) {
-                canWalkThroughDidHurt = true;
+                canWalkThroughDidHurtOrIdk = true;
                 return false;
             }
         }
 
-        if (!state.getFluidState().isEmpty()) return false;
+        if (!state.getFluidState().isEmpty()) {
+            if (setThingAtFluid) canWalkThroughDidHurtOrIdk = true;
+            return false;
+        }
 
         return state.getCollisionShape(mc.world, pos.set(x, y, z)).isEmpty();
+    }
+    private boolean canWalkThrough(int x, int y, int z) {
+        return canWalkThrough(x, y, z, false);
     }
 
     private boolean move(MoveType type, int x, int y, int z, float cost) {
