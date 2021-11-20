@@ -6,6 +6,7 @@ public class Node {
     public final int x, y, z;
     public float gScore = Float.POSITIVE_INFINITY;
     public float fScore = Float.POSITIVE_INFINITY;
+    public boolean inOpenSet;
 
     public Node cameFrom;
     public MoveType moveType;

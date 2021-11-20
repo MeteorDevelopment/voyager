@@ -9,6 +9,7 @@ import static meteordevelopment.voyager.Voyager.mc;
 
 public class MoveGenerator {
     private static final Block[] BLOCKS_THAT_MAKE_YOU_GO_OUCH = { Blocks.CACTUS, Blocks.FIRE, Blocks.SOUL_FIRE, Blocks.SWEET_BERRY_BUSH, Blocks.CAMPFIRE, Blocks.SOUL_CAMPFIRE };
+    private static final float SQRT_2 = (float) Math.sqrt(2);
 
     private static final BlockPos.Mutable pos = new BlockPos.Mutable();
 
@@ -99,7 +100,7 @@ public class MoveGenerator {
 
         if (!canX && !canZ) return false;
 
-        if (canX && canZ) return move(MoveType.Straight, x + dx, y, z + dz, 1);
+        if (canX && canZ) return move(MoveType.Straight, x + dx, y, z + dz, SQRT_2);
         return move(MoveType.CornerBump, x + dx, y, z + dz, 2.5f);
     }
 

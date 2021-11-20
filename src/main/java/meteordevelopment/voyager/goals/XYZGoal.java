@@ -24,9 +24,10 @@ public class XYZGoal implements IGoal {
 
     @Override
     public float heuristic(int x, int y, int z) {
-        float dx = this.x + 0.5f - x;
-        float dy = this.y + 0.5f - y;
-        float dz = this.z + 0.5f - z;
+        float dx = Math.abs(this.x - x);
+        float dy = Math.abs(this.y - y);
+        float dz = Math.abs(this.z - z);
+
         return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 }

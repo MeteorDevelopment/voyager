@@ -1,7 +1,9 @@
 package meteordevelopment.voyager.pathfinder;
 
+import it.unimi.dsi.fastutil.PriorityQueue;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectHeapPriorityQueue;
 import meteordevelopment.voyager.MoveGenerator;
 import meteordevelopment.voyager.Voyager;
 import meteordevelopment.voyager.goals.IGoal;
@@ -11,30 +13,32 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Comparator;
 
 public class Pathfinder {
+    public static Long2ObjectMap<Node> nodes;
+
     public static Path findPath(Voyager voyager, BlockPos start, IGoal goal) {
         if (voyager.getSettings().chatDebug.get()) Chat.send("Calculating path");
 
         long startTime = System.nanoTime();
 
-        Long2ObjectMap<Node> nodes = new Long2ObjectOpenHashMap<>();
-        PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(value -> value.fScore));
+        nodes = new Long2ObjectOpenHashMap<>();
+        PriorityQueue<Node> openSet = new ObjectHeapPriorityQueue<>(Comparator.comparingDouble(value -> value.fScore));
 
         Node startNode = new Node(start.getX(), start.getY(), start.getZ());
         startNode.gScore = 0;
         startNode.fScore = goal.heuristic(startNode);
         nodes.put(BlockPos.asLong(startNode.x, startNode.y, startNode.z), startNode);
         openSet.enqueue(startNode);
+        startNode.inOpenSet = true;
 
         MoveGenerator moves = new MoveGenerator(voyager.getWorldInterface());
         Node endedAt = null;
-        int visited = 0;
         int outsideHits = 0;
         boolean shouldContinue = false;
 
         loop:
         while (openSet.size() > 0) {
             Node current = openSet.dequeue();
-            visited++;
+            current.inOpenSet = false;
 
             if (goal.isInGoal(current)) {
                 endedAt = current;
@@ -53,12 +57,12 @@ public class Pathfinder {
                 }
 
                 long key = BlockPos.asLong(moves.moveX, moves.moveY, moves.moveZ);
-
                 Node node = nodes.get(key);
-                if (node != null) continue;
 
-                node = new Node(moves.moveX, moves.moveY, moves.moveZ);
-                nodes.put(key, node);
+                if (node == null) {
+                    node = new Node(moves.moveX, moves.moveY, moves.moveZ);
+                    nodes.put(key, node);
+                }
 
                 float tentativeGScore = current.gScore + moves.moveCost;
 
@@ -69,7 +73,10 @@ public class Pathfinder {
                     node.gScore = tentativeGScore;
                     node.fScore = node.gScore + goal.heuristic(node);
 
-                    if (!openSet.contains(node)) openSet.enqueue(node);
+                    if (!node.inOpenSet) {
+                        openSet.enqueue(node);
+                        node.inOpenSet = true;
+                    }
                 }
             }
         }
@@ -77,7 +84,7 @@ public class Pathfinder {
         if (voyager.getSettings().chatDebug.get()) {
             double elapsed = (System.nanoTime() - startTime) / 1000000000.0;
             Chat.send("Finished calculating path in %.3f s" + (endedAt == null ? ", no path" : ""), elapsed);
-            Chat.send("  Nodes: %d, Visited: %d, Outside hits: %d", nodes.size(), visited, outsideHits);
+            Chat.send("  Nodes: %d, Outside hits: %d", nodes.size(), outsideHits);
         }
 
         Path.Step step = null;
