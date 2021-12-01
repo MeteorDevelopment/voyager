@@ -9,6 +9,7 @@ import net.minecraft.text.LiteralText;
 public class EnumSetting<T extends Enum<T>> extends Setting<T> {
     private final Class<T> klass;
 
+    @SuppressWarnings("unchecked")
     public EnumSetting(String category, String name, String title, String description, T defaultValue) {
         super(category, name, title, description, defaultValue);
         klass = (Class<T>) defaultValue.getClass();

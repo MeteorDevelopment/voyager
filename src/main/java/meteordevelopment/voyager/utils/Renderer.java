@@ -18,7 +18,7 @@ public class Renderer {
     private boolean linesOnly, depthTest;
 
     public void begin(MatrixStack matrices, boolean linesOnly, boolean depthTest) {
-        this.matrix = matrices.peek().getModel();
+        this.matrix = matrices.peek().getPositionMatrix();
         this.linesOnly = linesOnly;
         this.depthTest = depthTest;
 

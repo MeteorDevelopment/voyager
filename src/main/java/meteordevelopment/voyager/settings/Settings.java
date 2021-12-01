@@ -90,7 +90,7 @@ public class Settings {
         if (file == null || !file.exists()) return;
 
         try {
-            JsonObject json = new JsonParser().parse(new FileReader(file)).getAsJsonObject();
+            JsonObject json = JsonParser.parseReader(new FileReader(file)).getAsJsonObject();
 
             for (Setting<?> setting : settings) {
                 JsonElement e = json.get(setting.name);

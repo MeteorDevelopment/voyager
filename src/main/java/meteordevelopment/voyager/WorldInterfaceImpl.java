@@ -30,7 +30,7 @@ public class WorldInterfaceImpl implements IWorldInterface {
 
         if (chunk == null) return Blocks.VOID_AIR.getDefaultState();
 
-        ChunkSection section = chunk.getSectionArray()[y >> 4];
+        ChunkSection section = chunk.getSectionArray()[chunk.getSectionIndex(y)];
         if (section == null) return Blocks.VOID_AIR.getDefaultState();
 
         lastChunk = chunk;
