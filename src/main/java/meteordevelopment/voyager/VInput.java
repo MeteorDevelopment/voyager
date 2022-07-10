@@ -130,7 +130,7 @@ public class VInput extends Input {
         }
 
         double distance = getDistanceToNext(vec2);
-        if (distance <= 0.01) {
+        if (distance <= 0.25) {
             Path.Step prev = current;
 
             if (!next()) stop = true;
