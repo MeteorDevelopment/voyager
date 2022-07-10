@@ -11,7 +11,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import meteordevelopment.voyager.utils.Color;
 import meteordevelopment.voyager.utils.RenderPath;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class Settings {
 
     public Screen createConfigScreen(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create()
-                .setTitle(new LiteralText("Voyager Config"))
+                .setTitle(Text.of("Voyager Config"))
                 .setParentScreen(parent)
                 .setSavingRunnable(this::save);
 
@@ -61,7 +61,7 @@ public class Settings {
         Map<String, ConfigCategory> categories = new HashMap<>();
 
         for (Setting<?> setting : settings) {
-            ConfigCategory category = categories.computeIfAbsent(setting.category, s -> builder.getOrCreateCategory(new LiteralText(s)));
+            ConfigCategory category = categories.computeIfAbsent(setting.category, s -> builder.getOrCreateCategory(Text.of(s)));
             category.addEntry(setting.createConfigEntry(entryBuilder));
         }
 

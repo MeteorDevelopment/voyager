@@ -36,7 +36,7 @@ public class VInput extends Input {
     }
 
     @Override
-    public void tick(boolean slowDown) {
+    public void tick(boolean slowDown, float f) {
         pressingForward = true;
         jumping = false;
 

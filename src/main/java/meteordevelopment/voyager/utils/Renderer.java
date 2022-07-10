@@ -80,13 +80,8 @@ public class Renderer {
         if (depthTest) RenderSystem.enableDepthTest();
         else RenderSystem.disableDepthTest();
 
-        lines.end();
-        BufferRenderer.draw(lines);
-
-        if (!linesOnly) {
-            triangles.end();
-            BufferRenderer.draw(triangles);
-        }
+        BufferRenderer.drawWithShader(lines.end());
+        if (!linesOnly) BufferRenderer.drawWithShader(triangles.end());
 
         RenderSystem.enableDepthTest();
         GL11.glDisable(GL11.GL_LINE_SMOOTH);

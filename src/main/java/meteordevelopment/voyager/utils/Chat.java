@@ -1,6 +1,6 @@
 package meteordevelopment.voyager.utils;
 
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import static meteordevelopment.voyager.Voyager.mc;
@@ -11,10 +11,10 @@ public class Chat {
     }
 
     public static void send(String format, Object... args) {
-        mc.player.sendMessage(new LiteralText(format(Formatting.GRAY, format, args)), false);
+        mc.player.sendMessage(Text.of(format(Formatting.GRAY, format, args)), false);
     }
 
     public static void error(String format, Object... args) {
-        mc.player.sendMessage(new LiteralText(format(Formatting.RED, format, args)), false);
+        mc.player.sendMessage(Text.of(format(Formatting.RED, format, args)), false);
     }
 }

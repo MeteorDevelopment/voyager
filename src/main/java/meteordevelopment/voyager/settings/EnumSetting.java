@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class EnumSetting<T extends Enum<T>> extends Setting<T> {
     private final Class<T> klass;
@@ -17,8 +17,8 @@ public class EnumSetting<T extends Enum<T>> extends Setting<T> {
 
     @Override
     public AbstractConfigListEntry<?> createConfigEntry(ConfigEntryBuilder builder) {
-        return builder.startEnumSelector(new LiteralText(title), klass, get())
-                .setTooltip(new LiteralText(description))
+        return builder.startEnumSelector(Text.of(title), klass, get())
+                .setTooltip(Text.of(description))
                 .setDefaultValue(getDefaultValue())
                 .setSaveConsumer(this::set)
                 .build();

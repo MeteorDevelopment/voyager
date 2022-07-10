@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import meteordevelopment.voyager.utils.Color;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class ColorSetting extends Setting<Color> {
     public ColorSetting(String category, String name, String title, String description, Color defaultValue) {
@@ -15,8 +15,8 @@ public class ColorSetting extends Setting<Color> {
 
     @Override
     public AbstractConfigListEntry<?> createConfigEntry(ConfigEntryBuilder builder) {
-        return builder.startAlphaColorField(new LiteralText(title), get().pack())
-                .setTooltip(new LiteralText(description))
+        return builder.startAlphaColorField(Text.of(title), get().pack())
+                .setTooltip(Text.of(description))
                 .setDefaultValue(get().pack())
                 .setSaveConsumer(integer -> set(new Color(integer)))
                 .build();

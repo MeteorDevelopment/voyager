@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class BoolSetting extends Setting<Boolean> {
     public BoolSetting(String category, String name, String title, String description, boolean defaultValue) {
@@ -13,8 +13,8 @@ public class BoolSetting extends Setting<Boolean> {
 
     @Override
     public AbstractConfigListEntry<?> createConfigEntry(ConfigEntryBuilder builder) {
-        return builder.startBooleanToggle(new LiteralText(title), get())
-                .setTooltip(new LiteralText(description))
+        return builder.startBooleanToggle(Text.of(title), get())
+                .setTooltip(Text.of(description))
                 .setDefaultValue(getDefaultValue())
                 .setSaveConsumer(this::set)
                 .build();
