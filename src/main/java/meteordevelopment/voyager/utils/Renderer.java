@@ -3,8 +3,8 @@ package meteordevelopment.voyager.utils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import static meteordevelopment.voyager.Voyager.mc;
@@ -72,7 +72,7 @@ public class Renderer {
     }
 
     public void end() {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -80,8 +80,8 @@ public class Renderer {
         if (depthTest) RenderSystem.enableDepthTest();
         else RenderSystem.disableDepthTest();
 
-        BufferRenderer.drawWithShader(lines.end());
-        if (!linesOnly) BufferRenderer.drawWithShader(triangles.end());
+        BufferRenderer.drawWithGlobalProgram(lines.end());
+        if (!linesOnly) BufferRenderer.drawWithGlobalProgram(triangles.end());
 
         RenderSystem.enableDepthTest();
         GL11.glDisable(GL11.GL_LINE_SMOOTH);

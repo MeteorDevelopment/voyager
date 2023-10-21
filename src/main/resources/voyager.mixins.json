@@ -4,14 +4,14 @@
   "package": "meteordevelopment.voyager.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "KeyboardMixin",
-    "LivingEntityMixin",
     "CameraMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ChatInputSuggestorMixin",
     "EntityMixin",
     "GameRendererMixin",
-    "MinecraftClientMixin",
-    "CommandSuggestorMixin",
-    "ClientPlayerEntityMixin"
+    "KeyboardMixin",
+    "LivingEntityMixin",
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1
