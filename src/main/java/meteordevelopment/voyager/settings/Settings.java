@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Settings {
     private final File file;
-    private final List<Setting<?>> settings = new ArrayList<>();
+    public final List<Setting<?>> settings = new ArrayList<>();
 
     public Settings(File file) {
         this.file = file;

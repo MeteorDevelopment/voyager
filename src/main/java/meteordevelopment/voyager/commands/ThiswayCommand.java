@@ -24,7 +24,7 @@ public class ThiswayCommand extends Command {
         }));
 
         builder.executes(context -> {
-            Voyager.INSTANCE.moveTo(new DirectionGoal(mc.player));
+            Voyager.INSTANCE.moveTo(new DirectionGoal(mc.player.getYaw()));
             return SUCCESS;
         });
     }

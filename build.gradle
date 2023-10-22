@@ -14,6 +14,14 @@ repositories {
         name "TerraformersMC"
         url "https://maven.terraformersmc.com/releases"
     }
+    maven {
+        name "Meteor - Releases"
+        url "https://maven.meteordev.org/releases"
+    }
+    maven {
+        name "Meteor - Snapshots"
+        url "https://maven.meteordev.org/snapshots"
+    }
 }
 
 dependencies {
@@ -25,6 +33,8 @@ dependencies {
     include "me.shedaniel.cloth:cloth-config-fabric:12.0.109"
 
     modApi "com.terraformersmc:modmenu:8.0.0-beta.2"
+
+    modCompileOnly "meteordevelopment:meteor-client:0.5.5-SNAPSHOT"
 }
 
 loom {

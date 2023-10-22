@@ -1,15 +1,15 @@
 package meteordevelopment.voyager.goals;
 
-import net.minecraft.entity.Entity;
+import meteordevelopment.voyager.Voyager;
 
 public class DirectionGoal implements IGoal {
     private final double yaw;
     private int x, z;
 
-    public DirectionGoal(Entity entity) {
-        this.x = (int) Math.floor(entity.getX());
-        this.z = (int) Math.floor(entity.getZ());
-        this.yaw = Math.toRadians(entity.getYaw());
+    public DirectionGoal(float yaw) {
+        this.x = (int) Math.floor(Voyager.mc.player.getX());
+        this.z = (int) Math.floor(Voyager.mc.player.getZ());
+        this.yaw = Math.toRadians(yaw);
 
         recalculate();
     }
